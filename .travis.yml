@@ -42,11 +42,13 @@ before_script:
         bash <(curl https://raw.githubusercontent.com/xd009642/tarpaulin/master/travis-install.sh)
         # Building & running tests, we need to install the wayland lib
         ./travis_install_wayland.sh "1.12.0"
+        export LD_LIBRARY_PATH="$HOME/install/lib:$LD_LIBRARY_PATH"
       elif [ -n "$BUILD_DOC" ]; then
         echo "Building doc, nothing to install..."
       else
         # Building & running tests, we need to install the wayland lib
         ./travis_install_wayland.sh "1.12.0"
+        export LD_LIBRARY_PATH="$HOME/install/lib:$LD_LIBRARY_PATH"
       fi
 
 os:
@@ -57,11 +59,12 @@ script:
       if [ -n "$BUILD_FMT" ]; then
         cargo fmt --all -- --write-mode=diff
       elif [ -n "$TARPAULIN" ]; then
-        env LD_LIBRARY_PATH=~/install/lib:$LD_LIBRARY_PATH cargo tarpaulin --ignore-tests --out Xml
+        cargo tarpaulin --ignore-tests --out Xml
+        cargo tarpaulin --features = "native_lib" --ignore-tests --out Xml
       elif [ -n "$BUILD_DOC" ]; then
         cargo doc --all --no-deps --all-features
       else
-        env LD_LIBRARY_PATH=~/install/lib:$LD_LIBRARY_PATH cargo test --all --features "$FEATURES"
+        cargo test --all --features "$FEATURES"
       fi
 
 after_success:

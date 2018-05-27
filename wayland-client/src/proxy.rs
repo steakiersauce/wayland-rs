@@ -451,7 +451,9 @@ impl<I: Interface + 'static> NewProxy<I> {
         Impl: Implementation<Proxy<I>, I::Event> + 'static,
     {
         #[cfg(not(feature = "native_lib"))]
-        {}
+        {
+            unimplemented!()
+        }
         #[cfg(feature = "native_lib")]
         {
             queue.assign_proxy(self.c_ptr());

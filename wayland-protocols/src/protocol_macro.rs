@@ -80,6 +80,7 @@ macro_rules! wayland_protocol(
     }
 );
 
+#[cfg(feature = "unstable_protocols")]
 #[macro_escape]
 macro_rules! wayland_protocol_versioned(
     ($name: expr, [$($version: ident),*], $rest:tt) => {

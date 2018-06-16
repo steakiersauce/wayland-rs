@@ -20,6 +20,7 @@ macro_rules! wayland_protocol(
             pub mod client {
                 //! Client-side API of this protocol
                 pub(crate) use wayland_client::{NewProxy, Proxy};
+                pub(crate) use wayland_commons::map::Object;
                 pub(crate) use wayland_commons::{AnonymousObject, Interface, MessageGroup};
                 pub(crate) use wayland_commons::wire::{MessageDesc, ArgumentType};
                 pub(crate) use wayland_client::protocol::{$($import),*};
@@ -30,8 +31,9 @@ macro_rules! wayland_protocol(
             pub mod server {
                 //! Server-side API of this protocol
                 pub(crate) use wayland_server::{NewResource, Resource};
+                pub(crate) use wayland_commons::map::Object;
                 pub(crate) use wayland_commons::{AnonymousObject, Interface, MessageGroup};
-                    pub(crate) use wayland_commons::wire::{MessageDesc, ArgumentType};
+                pub(crate) use wayland_commons::wire::{MessageDesc, ArgumentType};
                 pub(crate) use wayland_server::protocol::{$($import),*};
                 include!(concat!(env!("OUT_DIR"), "/", $name, "_rust_server_api.rs"));
             }
@@ -59,6 +61,7 @@ macro_rules! wayland_protocol(
             pub mod client {
                 //! Client-side API of this protocol
                 pub(crate) use wayland_client::{NewProxy, Proxy};
+                pub(crate) use wayland_commons::map::Object;
                 pub(crate) use wayland_commons::{AnonymousObject, Interface, MessageGroup};
                 pub(crate) use wayland_commons::wire::{MessageDesc, ArgumentType};
                 pub(crate) use wayland_sys as sys;
@@ -70,8 +73,9 @@ macro_rules! wayland_protocol(
             pub mod server {
                 //! Server-side API of this protocol
                 pub(crate) use wayland_server::{NewResource, Resource};
+                pub(crate) use wayland_commons::map::Object;
                 pub(crate) use wayland_commons::{AnonymousObject, Interface, MessageGroup};
-                    pub(crate) use wayland_commons::wire::{MessageDesc, ArgumentType};
+                pub(crate) use wayland_commons::wire::{MessageDesc, ArgumentType};
                 pub(crate) use wayland_sys as sys;
                 pub(crate) use wayland_server::protocol::{$($import),*};
                 include!(concat!(env!("OUT_DIR"), "/", $name, "_c_server_api.rs"));

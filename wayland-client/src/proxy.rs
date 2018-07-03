@@ -7,6 +7,9 @@ use event_queue::QueueToken;
 
 use imp::{NewProxyInner, ProxyInner};
 
+use wayland_commons::MessageGroup;
+use ProxyMap;
+
 /// An handle to a wayland proxy
 ///
 /// This represents a wayland object instanciated in your client
@@ -34,6 +37,14 @@ impl<I: Interface> Clone for Proxy<I> {
 }
 
 impl<I: Interface> Proxy<I> {
+    pub(crate) fn wrap(inner: ProxyInner) -> Proxy<I> {
+        debug_assert!(inner.is_interface::<I>());
+        Proxy {
+            _i: ::std::marker::PhantomData,
+            inner,
+        }
+    }
+
     /// Send a request through this object
     ///
     /// This is the generic method to send requests.
@@ -105,7 +116,7 @@ impl<I: Interface> Proxy<I> {
     pub fn child_versioned<C: Interface>(&self, version: u32) -> NewProxy<C> {
         NewProxy {
             _i: ::std::marker::PhantomData,
-            inner: self.inner.child_versioned::<C>(version)
+            inner: self.inner.child_versioned::<C>(version),
         }
     }
 
@@ -140,6 +151,7 @@ impl<I: Interface> Proxy<I> {
     pub fn is_implemented_with<Impl>(&self) -> bool
     where
         Impl: Implementation<Proxy<I>, I::Event> + 'static,
+        I::Event: MessageGroup<Map = super::ProxyMap>,
     {
         self.inner.is_implemented_with::<I, Impl>()
     }
@@ -246,10 +258,18 @@ pub struct NewProxy<I: Interface> {
 }
 
 impl<I: Interface + 'static> NewProxy<I> {
+    pub(crate) fn wrap(inner: NewProxyInner) -> NewProxy<I> {
+        NewProxy {
+            _i: ::std::marker::PhantomData,
+            inner,
+        }
+    }
+
     /// Implement this proxy using given function and implementation data.
     pub fn implement<Impl>(self, implementation: Impl) -> Proxy<I>
     where
         Impl: Implementation<Proxy<I>, I::Event> + Send + 'static,
+        I::Event: MessageGroup<Map = ProxyMap>,
     {
         let inner = unsafe { self.inner.implement::<I, _>(implementation) };
         Proxy {
@@ -274,6 +294,7 @@ impl<I: Interface + 'static> NewProxy<I> {
     pub unsafe fn implement_nonsend<Impl>(self, implementation: Impl, queue: &QueueToken) -> Proxy<I>
     where
         Impl: Implementation<Proxy<I>, I::Event> + 'static,
+        I::Event: MessageGroup<Map = ProxyMap>,
     {
         #[cfg(feature = "native_lib")]
         {
